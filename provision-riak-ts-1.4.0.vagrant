@@ -1,0 +1,83 @@
+#!/bin/bash
+
+## Try and make the bash work safely
+# Terminate on unitiialised variables
+set -u
+# Terminate on error
+set -e
+# Terminate if any part of a pipeline fails
+set -o pipefail
+
+# Uncomment for debugging
+set -x
+
+## Define the global variables
+readonly LOGFILE="/root/vagrant.provision.log"
+readonly RIAK_URL="http://s3.amazonaws.com/downloads.basho.com/riak_ts/1.4/1.4.0/ubuntu/trusty/riak-ts_1.4.0-1_amd64.deb"
+
+## All the functions that will be invoked in the main fn
+function should_provision_fn () {
+    if [ -f  "/var/vagrant_provision" ]; then
+	   exit 0
+    fi
+}
+
+function log_fn() {
+    String=$1
+    echo $String >> $LOGFILE
+}
+
+function add_basic_apps_fn() {
+
+    log_fn "Adding basic apps"
+
+    sed -i 's/#deb/deb/g' /etc/apt/sources.list 
+    sed -i 's/deb cdrom/# deb cdrom/g' /etc/apt/sources.list
+    sudo apt-get -y update >> $LOGFILE
+    sudo apt-get -y install emacs24 ntp git-core lynx-cur dbus-x11 gnome-icon-theme firefox chromium-browser ssh-askpass xclip gdb >> $LOGFILE
+}
+
+function install_riak_prerequisites_fn() {
+    echo "install riak prerequisitives" >> $LOGFILE
+    sudo apt-get -y install build-essential libpam0g-dev git >> $LOGFILE
+}
+
+function install_riak_fn() {
+    mkdir -p /home/vagrant/riak >> $LOGFILE
+    cd $_
+    curl -O $RIAK_URL >> $LOGFILE
+    sudo dpkg -i riak-ts_1.4.0-1_amd64.deb >> $LOGFILE
+}
+
+function install_tutorial_fn() {
+    cd /home/vagrant
+    git clone "https://github.com/basho-labs/euc2016-riak_ts_1.4.0-tutorial.git" >> $LOGFILE
+    mv "euc2016-riak_ts_1.4.0-tutorial" "tutorial" >> $LOGFILE
+    chown -R vagrant.vagrant "tutorial" >> $LOGFILE
+}
+
+function configure_riak_fn() {
+    sudo echo "riak soft nofile 65536" >> /etc/security/limits.conf
+    sudo echo "riak hard nofile 65536" >> /etc/security/limits.conf
+    sudo echo "vagrant soft nofile 65536" >> /etc/security/limits.conf
+    sudo echo "vagrant hard nofile 65536" >> /etc/security/limits.conf
+    # sudo echo "ulimit -n 65536" > /etc/default/riak >> $LOGFILE
+}
+
+function configure_vagrant_fn() {
+    touch /var/vagrant_provision
+}
+
+function main {
+    add_basic_apps_fn
+    install_riak_prerequisites_fn
+    install_riak_fn
+    install_tutorial_fn
+    configure_riak_fn
+    configure_vagrant_fn
+    echo "Installation finished" >> $LOGFILE
+}
+
+# Betty Boo - Doing The Do
+main
+ 

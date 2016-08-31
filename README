@@ -1,0 +1,24 @@
+README
+------
+
+This repository is designed to create a running Riak Time Series 1.4 environment running under Vagrant - with the tutorial material designed for the Erlang User Conference 2016 pre-installed
+
+How To Use
+----------
+
+clone this repository and cd into the root directory
+then run `vagrant up`
+
+When vagrant reports that the system has been provision you can login with the login bash script
+`./login`
+
+The password is 'vagrant'
+
+To shut down the vagrant box simply run `vagrant halt`.
+
+Installing Vagrant
+------------------
+
+This script has been developed and tested with Vagrant 1.8.1 which can be downloaded and installed here:
+https://releases.hashicorp.com/vagrant/
+
