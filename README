@@ -22,3 +22,9 @@ Installing Vagrant
 This script has been developed and tested with Vagrant 1.8.1 which can be downloaded and installed here:
 https://releases.hashicorp.com/vagrant/
 
+What To Install Yourself?
+-------------------------
+
+If you do not wish to use this box, please follow the instructions on this page to install riak TS 1.4.0 on your machine:
+http://docs.basho.com/riak/ts/1.4.0/setup/installing/
+
